@@ -1,0 +1,7 @@
+Since the script uses Python's robust native libraries (`sys`, `collections`), it technically does not require external software installations. However, portfolio repositories always look complete when a dependency file is included to clarify configuration requirements. 
+
+Create a file named `requirements.txt` containing the following baseline requirement entry:
+
+```text
+# Python Standard Library built-ins are utilized.
+# Compatible with Python version >= 3.8
