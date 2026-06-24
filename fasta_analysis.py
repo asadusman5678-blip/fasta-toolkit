@@ -1,9 +1,13 @@
 import sys
+import os
 
 if len(sys.argv) > 1:
     filename = sys.argv[1]
 else:
-    filename = "dna.example.fasta"
+    
+    print("Error: No FASTA file provided!")
+    print("Usage: python fasta_analysis.py <filename.fasta>")
+    sys.exit(1) 
 
 try:
     f = open(filename)
@@ -92,16 +96,15 @@ ATGAAAAAA
 
 does not have any stop codon in reading frame 1, we do not consider it to be an ORF in reading frame 1
     """
-# --- 1. Define the ORF Finder Function ---
+
 def get_orfs(sequence, frame):
     """
     Scans a sequence in a specific forward frame (1, 2, or 3).
     Returns a list of tuples: (orf_sequence, start_position_1_indexed, length)
     """
     orfs = []
-    start_index = frame - 1  # Convert frame 1,2,3 to Python index 0,1,2
+    start_index = frame - 1  
     
-    # Extract codons and track their 1-based character positions
     codons = []
     positions = []
     for i in range(start_index, len(sequence) - 2, 3):
@@ -130,11 +133,9 @@ def get_orfs(sequence, frame):
     return orfs
 
 
-# ==========================================
-# 2. Get and Validate User Inputs
-# ==========================================
 
-# --- Input 1: Validate Reading Frame ---
+
+
 while True:
     frame_input = input("Enter a forward reading frame (1, 2, or 3): ").strip()
     if frame_input in {"1", "2", "3"}:
@@ -143,7 +144,8 @@ while True:
     else:
         print("Invalid input! Please enter exactly 1, 2, or 3.\n")
 
-# --- Input 2: Validate Sequence Identifier ---
+
+
 while True:
     target_id = input("Enter a specific sequence identifier to look up: ").strip()
     if target_id in seqs:
@@ -153,7 +155,7 @@ while True:
         print(f"Available identifiers are: {', '.join(list(seqs.keys())[:5])}... (showing first 5)\n")
 
 
-# --- 3. Process Your 'seqs' Dictionary ---
+
 all_found_orfs = {}
 
 for name, seq in seqs.items():
@@ -162,7 +164,7 @@ for name, seq in seqs.items():
         all_found_orfs[name] = found
 
 
-# --- 4. Extract Answers to Your Questions ---
+
 if not all_found_orfs:
     print(f"\nNo valid ORFs found anywhere in the file for reading frame {chosen_frame}.")
 else:
@@ -196,21 +198,20 @@ else:
         print(f"--> No valid ORFs found inside sequence '{target_id}' for frame {chosen_frame}.")
 
 print("----------------------------------------------------------------------------------------")
-# --- Helper Function to Get the Reverse Complement ---
+
 def get_reverse_complement(seq):
     """
     Translates a DNA sequence to its complement and reverses it.
     """
     complement = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C', 
                   'a': 't', 't': 'a', 'c': 'g', 'g': 'c'}
-    # Replace each character with its complement, then reverse the string
+    
     complement_seq = [complement.get(base, base) for base in seq]
     return "".join(complement_seq)[::-1]
 
 
-# ==========================================
-# 5. Get and Validate Repeat Length (n)
-# ==========================================
+
+
 while True:
     n_input = input("Enter the length of the repeats to look for (n): ").strip()
     if n_input.isdigit() and int(n_input) > 0:
@@ -220,10 +221,8 @@ while True:
         print("Invalid input! Please enter a positive integer greater than 0.\n")
 
 
-# ==========================================
-# 6. Process and Count Repeats on Both Strands
-# ==========================================
-# Dictionaries to track occurrences separately and combined
+
+
 fwd_counts = {}
 rev_counts = {}
 combined_counts = {}
@@ -244,9 +243,8 @@ for name, fwd_seq in seqs.items():
         combined_counts[rev_sub] = combined_counts.get(rev_sub, 0) + 1
 
 
-# ==========================================
-# 7. Analyze and Print Results
-# ==========================================
+
+
 def analyze_strand_results(counts_dict, title):
     """
     Helper function to filter repeats (>1 occurrence) and find the maximums.
@@ -271,7 +269,7 @@ def analyze_strand_results(counts_dict, title):
     print(f"Most frequent pattern(s): {most_freq} (occurring {max_freq} times)")
 
 
-# Print the 3 separate reports requested
+
 analyze_strand_results(fwd_counts, f"FORWARD STRAND ANALYSIS (n={n})")
 analyze_strand_results(rev_counts, f"REVERSE STRAND ANALYSIS (n={n})")
 analyze_strand_results(combined_counts, f"COMBINED STRANDS ANALYSIS (n={n})")
